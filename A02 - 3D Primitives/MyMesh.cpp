@@ -276,7 +276,37 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+	float fHeight = a_fHeight * 0.5f;
+	float angleRad = glm::radians(360.0f / a_nSubdivisions);
+
+	std::vector<vector3> points;
+
+	points.push_back(vector3(0, fHeight, 0)); //0 - top point
+	points.push_back(vector3(0, -fHeight, 0)); //1 - base center
+
+	//make vertex around base of cone
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		points.push_back(vector3(a_fRadius * cosf(i * angleRad), -fHeight, a_fRadius * sinf(i * angleRad)));
+	}
+
+	//complete tris
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		//if we reach the end of the vector of points we want the last tri to connect with the original base vertice
+		if (i >= points.size() - 3)
+		{
+			AddTri(points[0], points[2], points[2 + i]);
+			AddTri(points[2 + i], points[2], points[1]);
+		}
+		else
+		{
+			AddTri(points[0], points[3 + i], points[2 + i]);
+			AddTri(points[2 + i], points[3 + i], points[1]);
+		}
+	}
+
+	//GenerateCube(a_fRadius * 2.0f, a_v3Color);
 	// -------------------------------
 
 	// Adding information about color
@@ -300,7 +330,46 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+	float fHeight = a_fHeight * 0.5f;
+	float angleRad = glm::radians(360.0f / a_nSubdivisions);
+
+	std::vector<vector3> points;
+
+	points.push_back(vector3(0, fHeight, 0)); //0 - top center
+	points.push_back(vector3(0, -fHeight, 0)); //1 - base center
+
+	//make vertices around top of cylinder
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		points.push_back(vector3(a_fRadius * cosf(i * angleRad), fHeight, a_fRadius * sinf(i * angleRad)));
+	}
+
+	//make vertices around top of cylinder
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		points.push_back(vector3(a_fRadius * cosf(i * angleRad), -fHeight, a_fRadius * sinf(i * angleRad)));
+	}
+
+
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		//if we reach the last vertex of each group
+		if (i >= a_nSubdivisions - 1)
+		{
+			AddTri(points[0], points[2], points[2 + i]);
+			AddTri(points[1], points[2 + a_nSubdivisions + i], points[2 + a_nSubdivisions]);
+			AddQuad(points[2 + a_nSubdivisions], points[2 + a_nSubdivisions + i], points[2], points[2 + i]);
+		}
+		else
+		{
+			//top tris
+			AddTri(points[0], points[3 + i], points[2 + i]);
+			//bottom tris
+			AddTri(points[1], points[2 + a_nSubdivisions + i], points[3 + a_nSubdivisions + i]);
+			//side quads
+			AddQuad(points[3 + a_nSubdivisions + i], points[2 + a_nSubdivisions + i], points[3 + i], points[2 + i]);
+		}
+	}
 	// -------------------------------
 
 	// Adding information about color
@@ -330,7 +399,60 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
+	float fHeight = a_fHeight * 0.5f;
+	float angleRad = glm::radians(360.0f / a_nSubdivisions);
+
+	std::vector<vector3> points;
+
+	//top inner vertices
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		points.push_back(vector3(a_fInnerRadius * cosf(i * angleRad), fHeight, a_fInnerRadius * sinf(i * angleRad)));
+	}
+	//top outer vertices
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		points.push_back(vector3(a_fOuterRadius * cosf(i * angleRad), fHeight, a_fOuterRadius * sinf(i * angleRad)));
+	}
+	//bottom inner vertices
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		points.push_back(vector3(a_fInnerRadius * cosf(i * angleRad), -fHeight, a_fInnerRadius * sinf(i * angleRad)));
+	}
+	//bottom outer vertices
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		points.push_back(vector3(a_fOuterRadius * cosf(i * angleRad), -fHeight, a_fOuterRadius * sinf(i * angleRad)));
+	}
+
+	//make quads
+	for (int i = 0; i < a_nSubdivisions; i++)
+	{
+		//if we reach the last vertex of each group
+		if (i >= a_nSubdivisions - 1)
+		{
+			//top quads
+			AddQuad(points[i], points[0], points[a_nSubdivisions + i], points[a_nSubdivisions]);
+			//bottom quads
+			AddQuad(points[a_nSubdivisions * 3 + i], points[a_nSubdivisions * 3], points[a_nSubdivisions * 2 + i], points[a_nSubdivisions * 2]);
+			//side quads
+			AddQuad(points[a_nSubdivisions + i], points[a_nSubdivisions], points[a_nSubdivisions * 3 + i], points[a_nSubdivisions * 3]);
+			//inner side quads
+			AddQuad(points[a_nSubdivisions * 2 + i], points[a_nSubdivisions * 2], points[i], points[0]);
+		}
+		else
+		{
+			//top quads
+			AddQuad(points[i], points[i + 1], points[a_nSubdivisions + i], points[a_nSubdivisions + i + 1]);
+			//bottom quads
+			AddQuad(points[a_nSubdivisions * 3 + i], points[a_nSubdivisions * 3 + i + 1], points[a_nSubdivisions * 2 + i], points[a_nSubdivisions * 2 + i + 1]);
+			//outer side quads
+			AddQuad(points[a_nSubdivisions + i], points[a_nSubdivisions + i + 1], points[a_nSubdivisions * 3 + i], points[a_nSubdivisions * 3 + i + 1]);
+			//inner side quads
+			AddQuad(points[a_nSubdivisions * 2 + i], points[a_nSubdivisions * 2 + i + 1], points[i], points[i + 1]);
+		}
+	}
+
 	// -------------------------------
 
 	// Adding information about color
@@ -362,7 +484,23 @@ void MyMesh::GenerateTorus(float a_fOuterRadius, float a_fInnerRadius, int a_nSu
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
+	//float radius = (a_fOuterRadius - a_fInnerRadius) / 2;
+	//float breakPosRad = glm::radians(360.0f / a_nSubdivisionsA);
+	//float vertexPosRad = glm::radians(360.0f / a_nSubdivisionsB);
+
+	//std::vector<vector3> points;
+
+	////first loop will determine where the breaks are
+	//for (int i = 0; i < a_nSubdivisionsA; i++)
+	//{
+	//	//second loop places the vertices on the breaks
+	//	for (int j = 0; j < a_nSubdivisionsB; i++)
+	//	{
+
+	//	}
+	//}
+
+	GenerateCube(a_fOuterRadius*2, a_v3Color);
 	// -------------------------------
 
 	// Adding information about color
@@ -387,7 +525,65 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+	float breaks = 18.0f;
+	float angleRad = glm::radians(360.0f / breaks);
+
+	std::vector<vector3> points;
+
+	//top
+	points.push_back(vector3(0, a_fRadius, 0));
+
+	//Middle
+	for (int i = 0; i < a_nSubdivisions * 2 - 1; i++)
+	{
+		float inAngle = glm::radians(90.0f - (i + 1) * (90.0f / a_nSubdivisions));
+		float height = a_fRadius * sinf(inAngle);
+		for (int j = 0; j < breaks; j++)
+		{
+			float x = a_fRadius * cosf(inAngle) * cosf(j * angleRad);
+			float z = a_fRadius * cosf(inAngle) * sinf(j * angleRad);
+			points.push_back(vector3(x, height, z));
+		}
+	}
+
+	//bottom
+	points.push_back(vector3(0, -a_fRadius, 0));
+
+	//draw top
+	for (int i = 0; i < breaks; i++)
+	{
+		//if we reach the end of the vector of points we want the last tri to connect with the original base vertice
+		if (i >= breaks - 1)
+		{
+			//top
+			AddTri(points[0], points[1], points[1 + i]);
+			//bottom
+			AddTri(points[points.size() - 1], points[points.size() - breaks + i], points[points.size() - breaks]);
+		}
+		else
+		{
+			//top
+			AddTri(points[0], points[2 + i], points[1 + i]);
+			//bottom
+			AddTri(points[points.size() - 1], points[points.size() - breaks + i], points[points.size() - breaks + 1 + i]);
+		}
+	}
+
+	//draw middle
+	for (int i = 0; i < a_nSubdivisions * 2 - 2; i++)
+	{
+		for (int j = 1; j < breaks; j++)
+		{
+			if (j >= breaks - 1)
+			{
+				AddQuad(points[j + breaks * i], points[1 + breaks * i], points[j + breaks * (i + 1)], points[1 + breaks * (i + 1)]);
+			}
+			else
+			{
+				AddQuad(points[j + breaks * i], points[j + 1 + breaks * i], points[j + breaks * (i + 1)], points[j + 1 + breaks * (i + 1)]);
+			}
+		}
+	}
 	// -------------------------------
 
 	// Adding information about color
