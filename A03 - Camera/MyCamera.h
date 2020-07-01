@@ -1,6 +1,6 @@
 /*----------------------------------------------
 Programmer: Alberto Bobadilla (labigm@gmail.com)
-Date: 2017/06
+Date: 2018/09
 ----------------------------------------------*/
 #ifndef __MYCAMERACLASS_H_
 #define __MYCAMERACLASS_H_
@@ -14,7 +14,7 @@ class MyCamera
 {
 	vector3 m_v3Position = vector3(0.0f, 0.0f, 10.0f); //Where my camera is located
 	vector3 m_v3Target = vector3(0.0f, 0.0f, 0.0f); //What I'm looking at
-	vector3 m_v3Up = vector3(0.0f, 1.0f, 0.0f); //What is up
+	vector3 m_v3Above = vector3(0.0f, 1.0f, 0.0f); //What is above the camera
 
 	bool m_bPerspective = true; //perspective view? False is Orthographic
 
@@ -41,7 +41,7 @@ public:
 	ARGUMENTS:
 	-	vector3 a_v3Position -> Where my camera is located
 	-	vector3 a_v3Target -> What I'm looking at
-	-	vector3 a_v3Upward -> What is up
+	-	vector3 a_v3Upward -> What direction is up
 	OUTPUT: ---
 	*/
 	MyCamera(vector3 a_v3Position, vector3 a_v3Target, vector3 a_v3Upward);
@@ -103,32 +103,32 @@ public:
 	vector3 GetPosition(void);
 
 	/*
-	USAGE: Sets the position of the camera
+	USAGE: Sets what the camera will be looking at
 	ARGUMENTS: vector3 a_v3Target -> What we want the camera to look at
 	OUTPUT: ---
 	*/
 	void SetTarget(vector3 a_v3Target);
 
 	/*
-	USAGE: Gets the position of the camera
+	USAGE: Gets what the camera will be looking at
 	ARGUMENTS: ---
-	OUTPUT: position of the camera
+	OUTPUT: target of the camera
 	*/
 	vector3 GetTarget(void);
 
 	/*
-	USAGE: Sets the position of the camera
-	ARGUMENTS: vector3 a_v3Up -> What up means in the world
+	USAGE: Sets the position of the point above the camera
+	ARGUMENTS: vector3 a_v3Above -> The point that is above the camera position
 	OUTPUT: ---
 	*/
-	void SetUp(vector3 a_v3Up);
+	void SetAbove(vector3 a_v3Above);
 
 	/*
-	USAGE: Gets the position of the camera
+	USAGE: Gets the position of the point above camera
 	ARGUMENTS: ---
-	OUTPUT: position of the camera
+	OUTPUT: position above the camera
 	*/
-	vector3 GetUp(void);
+	vector3 GetAbove(void);
 
 	/*
 	USAGE: Sets Perspective Camera
@@ -193,10 +193,10 @@ public:
 	ARGUMENTS:
 	-	vector3 a_v3Position -> Where my camera is located
 	-	vector3 a_v3Target -> What I'm looking at
-	-	vector3 a_v3Upward -> What is up
+	-	vector3 a_v3Upward -> What direction is up
 	OUTPUT: ---
 	*/
-	void SetPositionTargetAndUp(vector3 a_v3Position, vector3 a_v3Target, vector3 a_v3Upward = AXIS_Y);
+	void SetPositionTargetAndUpward(vector3 a_v3Position, vector3 a_v3Target, vector3 a_v3Upward = AXIS_Y);
 
 	/*
 	USAGE: Calculate what the camera should be looking at with the values of position target and up
@@ -211,6 +211,25 @@ public:
 	OUTPUT: ---
 	*/
 	void CalculateProjectionMatrix(void);
+
+	/*
+	USAGE: Translates the camera forward or backward
+	ARGUMENTS: float a_fDistance = 0.1f -> amount of movement
+	OUTPUT: ---
+	*/
+	void MoveForward(float a_fDistance = 0.1f);
+	/*
+	USAGE: Translates the camera Upward or downward
+	ARGUMENTS: float a_fDistance = 0.1f -> amount of movement
+	OUTPUT: ---
+	*/
+	void MoveVertical(float a_fDistance = 0.1f);
+	/*
+	USAGE: Translates the camera right or left
+	ARGUMENTS: float a_fDistance = 0.1f -> amount of movement
+	OUTPUT: ---
+	*/
+	void MoveSideways(float a_fDistance = 0.1f);
 };
 
 } //namespace Simplex
