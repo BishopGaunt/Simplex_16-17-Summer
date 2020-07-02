@@ -155,6 +155,7 @@ void MyCamera::MoveForward(float a_fDistance)
 	//forward vector = target - position
 	vector3 forward = glm::normalize(m_v3Target - m_v3Position);
 
+	//adjust position, target, and above
 	m_v3Position += a_fDistance * forward;
 	m_v3Target += a_fDistance * forward;
 	m_v3Above += a_fDistance * forward;
@@ -165,6 +166,7 @@ void MyCamera::MoveVertical(float a_fDistance)
 	//up vector = above - position
 	vector3 up = glm::normalize(m_v3Above - m_v3Position);
 
+	//adjust position, target, and above
 	m_v3Position += a_fDistance * up;
 	m_v3Target += a_fDistance * up;
 	m_v3Above += a_fDistance * up;
@@ -177,6 +179,7 @@ void MyCamera::MoveSideways(float a_fDistance)
 	vector3 up = glm::normalize(m_v3Above - m_v3Position);
 	vector3 right = glm::normalize(glm::cross(up, forward));
 
+	//adjust position, target, and above
 	m_v3Position += a_fDistance * right;
 	m_v3Target += a_fDistance * right;
 	m_v3Above += a_fDistance * right;

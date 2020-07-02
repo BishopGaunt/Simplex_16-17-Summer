@@ -369,18 +369,23 @@ void Application::CameraRotation(float a_fSpeed)
 		fAngleX += fDeltaMouse * a_fSpeed;
 	}
 	//Change the Yaw and the Pitch of the camera
+	//hold the original target vector
 	vector3 tempTarget = m_pCamera->GetTarget();
 
+	//gets the three vectors which make up the local axis
 	vector3 forward = glm::normalize(m_pCamera->GetTarget() - m_pCamera->GetPosition());
 	vector3 up = glm::normalize(m_pCamera->GetAbove() - m_pCamera->GetPosition());
 	vector3 right = glm::normalize(glm::cross(up, forward));
 
+	//apply rotations according to the movement of the mouse and correct axis
 	quaternion qX = glm::angleAxis(-fAngleX, right);
 	quaternion qY = glm::angleAxis(-fAngleY, up);
 
+	//apply the rotations to the target
 	tempTarget = tempTarget * qX;
 	tempTarget = tempTarget * qY;
 	
+	//set the target to the new target
 	m_pCamera->SetTarget(tempTarget);
 
 	SetCursorPos(CenterX, CenterY);//Position the mouse in the center
