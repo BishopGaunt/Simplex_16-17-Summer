@@ -287,6 +287,171 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 	(eSATResults::SAT_NONE has a value of 0)
 	*/
 
+	//get the a_pOther values
+	vector3 a_pCenter = a_pOther->GetCenterGlobal();
+	vector3 a_pHalfWidth = a_pOther->GetHalfWidth();
+	matrix4 a_pModelMatrix = a_pOther->GetModelMatrix();
+	matrix4 m_ModelMatrix = GetModelMatrix();
+
+	//get local axis
+	vector3 Ax = m_ModelMatrix * vector4(1, 0, 0, 1);
+	vector3 Ay = m_ModelMatrix * vector4(0, 1, 0, 1);
+	vector3 Az = m_ModelMatrix * vector4(0, 0, 1, 1);
+	std::vector<vector3> ALocal;
+	ALocal.push_back(Ax);
+	ALocal.push_back(Ay);
+	ALocal.push_back(Az);
+
+	vector3 Bx = a_pModelMatrix * vector4(1, 0, 0, 1);
+	vector3 By = a_pModelMatrix * vector4(0, 1, 0, 1);
+	vector3 Bz = a_pModelMatrix * vector4(0, 0, 1, 1);
+	std::vector<vector3> BLocal;
+	BLocal.push_back(Bx);
+	BLocal.push_back(By);
+	BLocal.push_back(Bz);
+
+	//combined halfwidths of both objects
+	float rA, rB;
+	float d = glm::distance(a_pCenter, GetCenterGlobal());
+
+	//Ax, Ay, Az
+	for (int i = 0; i < 3; i++)
+	{
+		rA = m_v3HalfWidth.x * abs(glm::dot(ALocal[0], ALocal[i])) +
+			m_v3HalfWidth.y * abs(glm::dot(ALocal[1], ALocal[i])) +
+			m_v3HalfWidth.z * abs(glm::dot(ALocal[2], ALocal[i]));
+
+		rB = a_pHalfWidth.x * abs(glm::dot(BLocal[0], ALocal[i])) +
+			a_pHalfWidth.y * abs(glm::dot(BLocal[1], ALocal[i])) +
+			a_pHalfWidth.z * abs(glm::dot(BLocal[2], ALocal[i]));
+
+		if (d > rA + rB)
+			return 1;
+	}
+
+	//Bx, By, Bz
+	for (int i = 0; i < 3; i++)
+	{
+		rA = m_v3HalfWidth.x * abs(glm::dot(ALocal[0], BLocal[i])) +
+			m_v3HalfWidth.y * abs(glm::dot(ALocal[1], BLocal[i])) +
+			m_v3HalfWidth.z * abs(glm::dot(ALocal[2], BLocal[i]));
+
+		rB = a_pHalfWidth.x * abs(glm::dot(BLocal[0], BLocal[i])) +
+			a_pHalfWidth.y * abs(glm::dot(BLocal[1], BLocal[i])) +
+			a_pHalfWidth.z * abs(glm::dot(BLocal[2], BLocal[i]));
+
+		if (d > rA + rB)
+			return 1;
+	}
+
+	//Ax X Bx
+	rA = m_v3HalfWidth.x * abs(glm::dot(ALocal[0], glm::cross(Ax, Bx))) +
+		m_v3HalfWidth.y * abs(glm::dot(ALocal[1], glm::cross(Ax, Bx))) +
+		m_v3HalfWidth.z * abs(glm::dot(ALocal[2], glm::cross(Ax, Bx)));
+
+	rB = a_pHalfWidth.x * abs(glm::dot(BLocal[0], glm::cross(Ax, Bx))) +
+		a_pHalfWidth.y * abs(glm::dot(BLocal[1], glm::cross(Ax, Bx))) +
+		a_pHalfWidth.z * abs(glm::dot(BLocal[2], glm::cross(Ax, Bx)));
+
+	if (d > rA + rB)
+		return 1;
+
+	//Ax X By
+	rA = m_v3HalfWidth.x * abs(glm::dot(ALocal[0], glm::cross(Ax, By))) +
+		m_v3HalfWidth.y * abs(glm::dot(ALocal[1], glm::cross(Ax, By))) +
+		m_v3HalfWidth.z * abs(glm::dot(ALocal[2], glm::cross(Ax, By)));
+
+	rB = a_pHalfWidth.x * abs(glm::dot(BLocal[0], glm::cross(Ax, By))) +
+		a_pHalfWidth.y * abs(glm::dot(BLocal[1], glm::cross(Ax, By))) +
+		a_pHalfWidth.z * abs(glm::dot(BLocal[2], glm::cross(Ax, By)));
+
+	if (d > rA + rB)
+		return 1;
+
+	//Ax X Bz
+	rA = m_v3HalfWidth.x * abs(glm::dot(ALocal[0], glm::cross(Ax, Bz))) +
+		m_v3HalfWidth.y * abs(glm::dot(ALocal[1], glm::cross(Ax, Bz))) +
+		m_v3HalfWidth.z * abs(glm::dot(ALocal[2], glm::cross(Ax, Bz)));
+
+	rB = a_pHalfWidth.x * abs(glm::dot(BLocal[0], glm::cross(Ax, Bz))) +
+		a_pHalfWidth.y * abs(glm::dot(BLocal[1], glm::cross(Ax, Bz))) +
+		a_pHalfWidth.z * abs(glm::dot(BLocal[2], glm::cross(Ax, Bz)));
+
+	if (d > rA + rB)
+		return 1;
+
+	//Ay X Bx
+	rA = m_v3HalfWidth.x * abs(glm::dot(ALocal[0], glm::cross(Ay, Bx))) +
+		m_v3HalfWidth.y * abs(glm::dot(ALocal[1], glm::cross(Ay, Bx))) +
+		m_v3HalfWidth.z * abs(glm::dot(ALocal[2], glm::cross(Ay, Bx)));
+
+	rB = a_pHalfWidth.x * abs(glm::dot(BLocal[0], glm::cross(Ay, Bx))) +
+		a_pHalfWidth.y * abs(glm::dot(BLocal[1], glm::cross(Ay, Bx))) +
+		a_pHalfWidth.z * abs(glm::dot(BLocal[2], glm::cross(Ay, Bx)));
+
+	if (d > rA + rB)
+		return 1;
+
+	//Ay X By
+	rA = m_v3HalfWidth.x * abs(glm::dot(ALocal[0], glm::cross(Ay, By))) +
+		m_v3HalfWidth.y * abs(glm::dot(ALocal[1], glm::cross(Ay, By))) +
+		m_v3HalfWidth.z * abs(glm::dot(ALocal[2], glm::cross(Ay, By)));
+
+	rB = a_pHalfWidth.x * abs(glm::dot(BLocal[0], glm::cross(Ay, By))) +
+		a_pHalfWidth.y * abs(glm::dot(BLocal[1], glm::cross(Ay, By))) +
+		a_pHalfWidth.z * abs(glm::dot(BLocal[2], glm::cross(Ay, By)));
+
+	if (d > rA + rB)
+		return 1;
+
+	//Ay X Bz
+	rA = m_v3HalfWidth.x * abs(glm::dot(ALocal[0], glm::cross(Ay, Bz))) +
+		m_v3HalfWidth.y * abs(glm::dot(ALocal[1], glm::cross(Ay, Bz))) +
+		m_v3HalfWidth.z * abs(glm::dot(ALocal[2], glm::cross(Ay, Bz)));
+
+	rB = a_pHalfWidth.x * abs(glm::dot(BLocal[0], glm::cross(Ay, Bz))) +
+		a_pHalfWidth.y * abs(glm::dot(BLocal[1], glm::cross(Ay, Bz))) +
+		a_pHalfWidth.z * abs(glm::dot(BLocal[2], glm::cross(Ay, Bz)));
+
+	if (d > rA + rB)
+		return 1;
+
+	//Az X Bx
+	rA = m_v3HalfWidth.x * abs(glm::dot(ALocal[0], glm::cross(Az, Bx))) +
+		m_v3HalfWidth.y * abs(glm::dot(ALocal[1], glm::cross(Az, Bx))) +
+		m_v3HalfWidth.z * abs(glm::dot(ALocal[2], glm::cross(Az, Bx)));
+
+	rB = a_pHalfWidth.x * abs(glm::dot(BLocal[0], glm::cross(Az, Bx))) +
+		a_pHalfWidth.y * abs(glm::dot(BLocal[1], glm::cross(Az, Bx))) +
+		a_pHalfWidth.z * abs(glm::dot(BLocal[2], glm::cross(Az, Bx)));
+
+	if (d > rA + rB)
+		return 1;
+
+	//Az X By
+	rA = m_v3HalfWidth.x * abs(glm::dot(ALocal[0], glm::cross(Az, By))) +
+		m_v3HalfWidth.y * abs(glm::dot(ALocal[1], glm::cross(Az, By))) +
+		m_v3HalfWidth.z * abs(glm::dot(ALocal[2], glm::cross(Az, By)));
+
+	rB = a_pHalfWidth.x * abs(glm::dot(BLocal[0], glm::cross(Az, By))) +
+		a_pHalfWidth.y * abs(glm::dot(BLocal[1], glm::cross(Az, By))) +
+		a_pHalfWidth.z * abs(glm::dot(BLocal[2], glm::cross(Az, By)));
+
+	if (d > rA + rB)
+		return 1;
+
+	//Az X Bz
+	rA = m_v3HalfWidth.x * abs(glm::dot(ALocal[0], glm::cross(Az, Bz))) +
+		m_v3HalfWidth.y * abs(glm::dot(ALocal[1], glm::cross(Az, Bz))) +
+		m_v3HalfWidth.z * abs(glm::dot(ALocal[2], glm::cross(Az, Bz)));
+
+	rB = a_pHalfWidth.x * abs(glm::dot(BLocal[0], glm::cross(Az, Bz))) +
+		a_pHalfWidth.y * abs(glm::dot(BLocal[1], glm::cross(Az, Bz))) +
+		a_pHalfWidth.z * abs(glm::dot(BLocal[2], glm::cross(Az, Bz)));
+
+	if (d > rA + rB)
+		return 1;
+
 	//there is no axis test that separates this two objects
 	return eSATResults::SAT_NONE;
 }

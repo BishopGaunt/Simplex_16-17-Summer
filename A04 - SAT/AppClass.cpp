@@ -2,14 +2,11 @@
 using namespace Simplex;
 void Application::InitVariables(void)
 {
-	////Change this to your name and email
-	//m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
-
-	////Alberto needed this at this position for software recording.
-	//m_pWindow->setPosition(sf::Vector2i(710, 0));
+	//Change this to your name and email
+	m_sProgrammer = "Ikenna Ajah - ira8296@rit.edu";
 
 	//Set the position and target of the camera
-	m_pCameraMngr->SetPositionTargetAndUp(
+	m_pCameraMngr->SetPositionTargetAndUpward(
 		vector3(0.0f, 3.0f, 13.0f), //Position
 		vector3(0.0f, 3.0f, 12.0f),	//Target
 		AXIS_Y);					//Up
@@ -44,7 +41,7 @@ void Application::Update(void)
 	m_pMeshMngr->AddAxisToRenderList(mCreeper);
 
 	//Set model matrix to Steve
-	matrix4 mSteve = glm::translate(vector3(2.25f, 0.0f, 0.0f)) * glm::rotate(IDENTITY_M4, -55.0f, AXIS_Z);
+	matrix4 mSteve = glm::translate(vector3(2.25f, 0.0f, 0.0f)) * glm::rotate(IDENTITY_M4, glm::radians(-55.0f), AXIS_Z);
 	m_pSteve->SetModelMatrix(mSteve);
 	m_pSteveRB->SetModelMatrix(mSteve);
 	m_pMeshMngr->AddAxisToRenderList(mSteve);

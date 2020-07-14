@@ -214,6 +214,12 @@ public:
 	*/
 	vector3 GetHalfWidth(void);
 	/*
+	Usage: Projects a vector onto another vector
+	Arguments: Vector to be projected and target vector to project on
+	Output: The resulting float
+	*/
+	float Project(vector3 project, vector3 target);
+	/*
 	Usage: Gets Model to World matrix
 	Arguments: ---
 	Output: model to world matrix
