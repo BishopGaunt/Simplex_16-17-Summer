@@ -3,7 +3,7 @@ using namespace Simplex;
 void Application::InitVariables(void)
 {
 	//Set the position and target of the camera
-	m_pCameraMngr->SetPositionTargetAndUp(
+	m_pCameraMngr->SetPositionTargetAndUpward(
 		vector3(0.0f, 0.0f, 100.0f), //Position
 		vector3(0.0f, 0.0f, 99.0f),	//Target
 		AXIS_Y);					//Up
@@ -29,7 +29,9 @@ void Application::InitVariables(void)
 			m_pEntityMngr->SetModelMatrix(m4Position);
 		}
 	}
+
 	m_uOctantLevels = 1;
+	m_pRoot = new Octree(m_uOctantLevels, 5);
 	m_pEntityMngr->Update();
 }
 void Application::Update(void)
@@ -55,7 +57,8 @@ void Application::Display(void)
 	ClearScreen();
 
 	//display octree
-	//m_pRoot->Display();
+	m_pRoot->Display(m_uOctantID);
+	m_pMeshMngr->AddCubeToRenderList(IDENTITY_M4, C_RED, RENDER_WIRE);
 	
 	// draw a skybox
 	m_pMeshMngr->AddSkyboxToRenderList();
@@ -74,6 +77,9 @@ void Application::Display(void)
 }
 void Application::Release(void)
 {
+	//release the octree
+	SafeDelete(m_pRoot);
+
 	//release GUI
 	ShutdownGUI();
 }

@@ -113,27 +113,26 @@ void Application::ProcessKeyReleased(sf::Event a_event)
 		break;
 	case sf::Keyboard::PageUp:
 		++m_uOctantID;
-		/*
+		
 		if (m_uOctantID >= m_pRoot->GetOctantCount())
 			m_uOctantID = - 1;
-		*/
+		
 		break;
 	case sf::Keyboard::PageDown:
 		--m_uOctantID;
-		/*
+		
 		if (m_uOctantID >= m_pRoot->GetOctantCount())
 			m_uOctantID = - 1;
-		*/
+		
 		break;
 	case sf::Keyboard::Add:
 		if (m_uOctantLevels < 4)
 		{
 			m_pEntityMngr->ClearDimensionSetAll();
 			++m_uOctantLevels;
-			/*
+			
 			SafeDelete(m_pRoot);
-			m_pRoot = new MyOctant(m_uOctantLevels, 5);
-			*/
+			m_pRoot = new Octree(m_uOctantLevels, 5);
 		}
 		break;
 	case sf::Keyboard::Subtract:
@@ -141,10 +140,9 @@ void Application::ProcessKeyReleased(sf::Event a_event)
 		{
 			m_pEntityMngr->ClearDimensionSetAll();
 			--m_uOctantLevels;
-			/*
+			
 			SafeDelete(m_pRoot);
-			m_pRoot = new MyOctant(m_uOctantLevels, 5);
-			*/
+			m_pRoot = new Octree(m_uOctantLevels, 5);
 		}
 		break;
 	case sf::Keyboard::LShift:
@@ -398,8 +396,8 @@ void Application::CameraRotation(float a_fSpeed)
 		fAngleX += fDeltaMouse * a_fSpeed;
 	}
 	//Change the Yaw and the Pitch of the camera
-	m_pCameraMngr->ChangeYaw(fAngleY * 3.0f);
-	m_pCameraMngr->ChangePitch(-fAngleX * 3.0f);
+	m_pCameraMngr->ChangeYaw(fAngleY * 0.25f);
+	m_pCameraMngr->ChangePitch(-fAngleX * 0.25f);
 	SetCursorPos(CenterX, CenterY);//Position the mouse in the center
 }
 //Keyboard
@@ -470,8 +468,10 @@ void Application::ProcessJoystick(void)
 #pragma endregion
 #pragma region Camera Orientation
 	//Change the Yaw and the Pitch of the camera
-	m_pCameraMngr->ChangeYaw(-m_pController[m_uActCont]->axis[SimplexAxis_U] / 150.0f);
-	m_pCameraMngr->ChangePitch(m_pController[m_uActCont]->axis[SimplexAxis_V] / 150.0f);
+	float fUSpeed = glm::radians(m_pController[m_uActCont]->axis[SimplexAxis_U] / 150.0f);
+	float fVSpeed = glm::radians(m_pController[m_uActCont]->axis[SimplexAxis_V] / 150.0f);
+	m_pCameraMngr->ChangeYaw(-fUSpeed);
+	m_pCameraMngr->ChangePitch(fVSpeed);
 #pragma endregion
 #pragma region ModelOrientation Orientation
 	m_qArcBall = quaternion(vector3(glm::radians(m_pController[m_uActCont]->axis[SimplexAxis_POVY] / 20.0f), 0.0f, 0.0f)) * m_qArcBall;
