@@ -1,0 +1,10 @@
+Controls:
+WASD to control camera
+
+Notes:
+-Used a blank version of our A04-SAT project
+-A* path show with green planes
+-Creeper will using LERP to move towards Steve
+-Collision handled with ARBB
+-Upon collision Steve will randomly teleport
+-Missing blocks serve as obstacles
